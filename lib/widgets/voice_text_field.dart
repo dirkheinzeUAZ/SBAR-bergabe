@@ -53,7 +53,10 @@ class _VoiceTextFieldState extends State<VoiceTextField> {
     if (!available) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Spracherkennung ist auf diesem Gerät nicht verfügbar.')),
+          SnackBar(
+            content: Text(_speechService.lastError ?? 'Spracherkennung ist auf diesem Gerät nicht verfügbar.'),
+            duration: const Duration(seconds: 6),
+          ),
         );
       }
       return;
