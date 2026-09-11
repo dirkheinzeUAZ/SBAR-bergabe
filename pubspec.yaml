@@ -1,0 +1,44 @@
+name: sbar_uebergabe
+description: "SBAR Übergabe – Strukturierte Patientenübergabe für die Intensivpflege."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State management
+  provider: 6.1.5+1
+
+  # Local storage (no cloud, fully on-device)
+  hive: 2.2.3
+  hive_flutter: 1.1.0
+  shared_preferences: 2.5.3
+  path_provider: ^2.1.4
+
+  # Speech to text for voice input
+  speech_to_text: ^7.0.0
+
+  # UUID for generating local IDs (beds, entries)
+  uuid: ^4.5.1
+
+  # Utility
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icons/
