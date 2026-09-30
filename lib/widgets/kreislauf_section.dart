@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/sbar_data.dart';
 import '../theme/app_theme.dart';
+import '../utils/decimal_input_formatter.dart';
 
 /// Kreislauf-Abschnitt: Katecholamine ja/nein, pro Substanz Dosierung
 /// (µg/kg/min) <-> Perfusor-Laufrate (ml/h), Umrechnung in beide Richtungen
@@ -229,6 +230,7 @@ class _KreislaufSectionState extends State<KreislaufSection> {
     return TextField(
       controller: ctrl..selection = TextSelection.collapsed(offset: ctrl.text.length),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: decimalInputFormatters(decimalDigits: 2),
       decoration: InputDecoration(labelText: label, isDense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10)),
       onChanged: (v) => onChanged(double.tryParse(v.replaceAll(',', '.'))),
     );

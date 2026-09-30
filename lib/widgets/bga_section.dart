@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/sbar_data.dart';
 import '../theme/app_theme.dart';
+import '../utils/decimal_input_formatter.dart';
 
 /// BGA-Abschnitt: feste, immer sichtbare Eingabefelder für die
 /// Blutgasanalyse (PaO2, PaCO2, HCO3, BE, Laktat, pH, Hb, K+, BZ) sowie
@@ -96,6 +97,7 @@ class _BgaSectionState extends State<BgaSection> {
               child: _numberField(
                 label: 'BE (mmol/l)',
                 value: s.bgaBe,
+                allowNegative: true,
                 onChanged: (v) => setState(() {
                   s.bgaBe = v;
                   widget.onChanged();
@@ -227,12 +229,14 @@ class _BgaSectionState extends State<BgaSection> {
     required double? value,
     required ValueChanged<double?> onChanged,
     int decimals = 0,
+    bool allowNegative = false,
   }) {
     final text = value == null ? '' : (decimals > 0 ? value.toStringAsFixed(decimals) : _fmt(value));
     final ctrl = TextEditingController(text: text);
     return TextField(
       controller: ctrl..selection = TextSelection.collapsed(offset: ctrl.text.length),
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      keyboardType: TextInputType.numberWithOptions(decimal: true, signed: allowNegative),
+      inputFormatters: decimalInputFormatters(decimalDigits: 2, allowNegative: allowNegative),
       decoration: InputDecoration(
         labelText: label,
         isDense: true,

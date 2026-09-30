@@ -3,6 +3,7 @@ import '../models/bed_patient.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/privacy_hint.dart';
+import '../utils/decimal_input_formatter.dart';
 
 /// Bearbeitungs-Screen für die medizinischen Basisdaten eines Bettes.
 /// Enthält bewusst NUR die zulässigen, nicht identifizierenden Felder.
@@ -130,6 +131,7 @@ class _BedEditScreenState extends State<BedEditScreen> {
                           TextField(
                             controller: _weightCtrl,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: decimalInputFormatters(decimalDigits: 2),
                             decoration: const InputDecoration(hintText: 'z.B. 78'),
                           ),
                         ],
@@ -142,6 +144,7 @@ class _BedEditScreenState extends State<BedEditScreen> {
                 TextField(
                   controller: _heightCtrl,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: decimalInputFormatters(decimalDigits: 2),
                   decoration: const InputDecoration(hintText: 'z.B. 175'),
                 ),
               ],

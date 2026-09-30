@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/sbar_data.dart';
 import '../theme/app_theme.dart';
+import '../utils/decimal_input_formatter.dart';
 
 /// Drainagen-Abschnitt: strukturierte Liste mit mehreren Einträgen.
 /// Typen: Ventrikel, Redon, Robinson, Thorax, Easyflow.
@@ -205,6 +206,7 @@ class _DrainageSectionState extends State<DrainageSection> {
     return TextField(
       controller: ctrl..selection = TextSelection.collapsed(offset: ctrl.text.length),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: decimalInputFormatters(decimalDigits: 2),
       decoration: InputDecoration(
         labelText: label,
         isDense: true,
