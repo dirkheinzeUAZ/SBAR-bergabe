@@ -7,6 +7,8 @@ import '../widgets/category_card.dart';
 import '../widgets/score_selectors.dart';
 import '../widgets/kreislauf_section.dart';
 import '../widgets/atmung_section.dart';
+import '../widgets/bga_section.dart';
+import '../widgets/drainage_section.dart';
 import 'bed_edit_screen.dart';
 import 'guided_mode_screen.dart';
 import 'draft_screen.dart';
@@ -56,7 +58,7 @@ class _SbarHandoverScreenState extends State<SbarHandoverScreen> with SingleTick
     _urinCtrl = TextEditingController(text: s.urinMlProH);
     _stuhlgangCtrl = TextEditingController(text: s.stuhlgang);
     _ausscheidungSonstCtrl = TextEditingController(text: s.ausscheidungSonstiges);
-    _wundenCtrl = TextEditingController(text: s.wundenDrainagen);
+    _wundenCtrl = TextEditingController(text: s.wunden);
     _zugaengeCtrl = TextEditingController(text: s.zugaenge);
     _medikationCtrl = TextEditingController(text: s.medikationText);
     _infektionenCtrl = TextEditingController(text: s.infektionenText);
@@ -106,7 +108,7 @@ class _SbarHandoverScreenState extends State<SbarHandoverScreen> with SingleTick
     s.urinMlProH = _urinCtrl.text;
     s.stuhlgang = _stuhlgangCtrl.text;
     s.ausscheidungSonstiges = _ausscheidungSonstCtrl.text;
-    s.wundenDrainagen = _wundenCtrl.text;
+    s.wunden = _wundenCtrl.text;
     s.zugaenge = _zugaengeCtrl.text;
     s.medikationText = _medikationCtrl.text;
     s.infektionenText = _infektionenCtrl.text;
@@ -139,7 +141,7 @@ class _SbarHandoverScreenState extends State<SbarHandoverScreen> with SingleTick
       _urinCtrl.text = s.urinMlProH;
       _stuhlgangCtrl.text = s.stuhlgang;
       _ausscheidungSonstCtrl.text = s.ausscheidungSonstiges;
-      _wundenCtrl.text = s.wundenDrainagen;
+      _wundenCtrl.text = s.wunden;
       _zugaengeCtrl.text = s.zugaenge;
       _medikationCtrl.text = s.medikationText;
       _infektionenCtrl.text = s.infektionenText;
@@ -344,10 +346,17 @@ class _SbarHandoverScreenState extends State<SbarHandoverScreen> with SingleTick
                   _logChangeAndSave('Atmung – Modus');
                 },
               ),
+              const SizedBox(height: 16),
+              const Divider(height: 1),
+              const SizedBox(height: 14),
+              BgaSection(
+                sbar: s,
+                onChanged: () => _logChangeAndSave('Atmung/Beatmung – BGA'),
+              ),
               const SizedBox(height: 14),
               VoiceTextField(
-                label: 'Weitere Angaben (BGA, Parameter, ...)',
-                hint: 'BGA-Werte, sonstige Parameter...',
+                label: 'Weitere Angaben',
+                hint: 'Sonstige Parameter, Auffälligkeiten...',
                 controller: _atmungCtrl,
                 showPrivacyHint: false,
                 minLines: 2,
@@ -476,13 +485,27 @@ class _SbarHandoverScreenState extends State<SbarHandoverScreen> with SingleTick
         CategoryCard(
           icon: Icons.healing_outlined,
           title: 'Wunden / Drainagen',
-          subtitle: _wundenCtrl.text.trim().isEmpty ? 'Keine Angabe' : 'Erfasst',
-          child: VoiceTextField(
-            label: '',
-            hint: 'Wundstatus, Drainagen (Art, Menge, Beschaffenheit)...',
-            controller: _wundenCtrl,
-            showPrivacyHint: false,
-            onChanged: (_) => _logChangeAndSave('Wunden/Drainagen'),
+          subtitle: s.drainagen.isEmpty && _wundenCtrl.text.trim().isEmpty ? 'Keine Angabe' : 'Erfasst',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              VoiceTextField(
+                label: 'Wundstatus',
+                hint: 'Wundverhältnisse, Verbandswechsel...',
+                controller: _wundenCtrl,
+                showPrivacyHint: false,
+                minLines: 2,
+                maxLines: 5,
+                onChanged: (_) => _logChangeAndSave('Wunden'),
+              ),
+              const SizedBox(height: 16),
+              const Divider(height: 1),
+              const SizedBox(height: 14),
+              DrainageSection(
+                entries: s.drainagen,
+                onChanged: () => _logChangeAndSave('Drainagen'),
+              ),
+            ],
           ),
         ),
         CategoryCard(

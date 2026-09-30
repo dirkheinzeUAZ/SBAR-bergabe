@@ -58,10 +58,10 @@ class _GuidedModeScreenState extends State<GuidedModeScreen> {
         onSave: (v) => s.kreislauf = v,
       ),
       _GuidedStep(
-        category: 'Wunden/Drainagen',
-        question: 'Gibt es relevante Wunden oder Drainagen zu berichten?',
-        controller: TextEditingController(text: s.wundenDrainagen),
-        onSave: (v) => s.wundenDrainagen = v,
+        category: 'Wunden',
+        question: 'Gibt es relevante Wunden zu berichten? (Drainagen werden separat in der Übersicht erfasst)',
+        controller: TextEditingController(text: s.wunden),
+        onSave: (v) => s.wunden = v,
       ),
       _GuidedStep(
         category: 'Zugänge',
