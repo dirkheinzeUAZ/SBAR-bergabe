@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/sbar_data.dart';
 import '../theme/app_theme.dart';
-import '../utils/decimal_input_formatter.dart';
+import 'decimal_number_field.dart';
 
 /// BGA-Abschnitt: feste, immer sichtbare Eingabefelder für die
 /// Blutgasanalyse (PaO2, PaCO2, HCO3, BE, Laktat, pH, Hb, K+, BZ) sowie
@@ -30,24 +30,26 @@ class _BgaSectionState extends State<BgaSection> {
         Row(
           children: [
             Expanded(
-              child: _numberField(
+              child: DecimalNumberField(
                 label: 'FiO2 (%)',
                 value: s.fiO2Prozent,
-                onChanged: (v) => setState(() {
+                onChanged: (v) {
                   s.fiO2Prozent = v;
+                  setState(() {});
                   widget.onChanged();
-                }),
+                },
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: _numberField(
+              child: DecimalNumberField(
                 label: 'PaO2 (mmHg)',
                 value: s.bgaPaO2,
-                onChanged: (v) => setState(() {
+                onChanged: (v) {
                   s.bgaPaO2 = v;
+                  setState(() {});
                   widget.onChanged();
-                }),
+                },
               ),
             ),
           ],
@@ -56,25 +58,26 @@ class _BgaSectionState extends State<BgaSection> {
         Row(
           children: [
             Expanded(
-              child: _numberField(
+              child: DecimalNumberField(
                 label: 'PaCO2 (mmHg)',
                 value: s.bgaPaCO2,
-                onChanged: (v) => setState(() {
+                onChanged: (v) {
                   s.bgaPaCO2 = v;
+                  setState(() {});
                   widget.onChanged();
-                }),
+                },
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: _numberField(
+              child: DecimalNumberField(
                 label: 'pH-Wert',
                 value: s.bgaPh,
-                decimals: 2,
-                onChanged: (v) => setState(() {
+                onChanged: (v) {
                   s.bgaPh = v;
+                  setState(() {});
                   widget.onChanged();
-                }),
+                },
               ),
             ),
           ],
@@ -83,25 +86,27 @@ class _BgaSectionState extends State<BgaSection> {
         Row(
           children: [
             Expanded(
-              child: _numberField(
+              child: DecimalNumberField(
                 label: 'HCO3 (mmol/l)',
                 value: s.bgaHco3,
-                onChanged: (v) => setState(() {
+                onChanged: (v) {
                   s.bgaHco3 = v;
+                  setState(() {});
                   widget.onChanged();
-                }),
+                },
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: _numberField(
+              child: DecimalNumberField(
                 label: 'BE (mmol/l)',
                 value: s.bgaBe,
                 allowNegative: true,
-                onChanged: (v) => setState(() {
+                onChanged: (v) {
                   s.bgaBe = v;
+                  setState(() {});
                   widget.onChanged();
-                }),
+                },
               ),
             ),
           ],
@@ -110,24 +115,26 @@ class _BgaSectionState extends State<BgaSection> {
         Row(
           children: [
             Expanded(
-              child: _numberField(
+              child: DecimalNumberField(
                 label: 'Laktat (mmol/l)',
                 value: s.bgaLaktat,
-                onChanged: (v) => setState(() {
+                onChanged: (v) {
                   s.bgaLaktat = v;
+                  setState(() {});
                   widget.onChanged();
-                }),
+                },
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: _numberField(
+              child: DecimalNumberField(
                 label: 'Hb (g/dl)',
                 value: s.bgaHb,
-                onChanged: (v) => setState(() {
+                onChanged: (v) {
                   s.bgaHb = v;
+                  setState(() {});
                   widget.onChanged();
-                }),
+                },
               ),
             ),
           ],
@@ -136,24 +143,26 @@ class _BgaSectionState extends State<BgaSection> {
         Row(
           children: [
             Expanded(
-              child: _numberField(
+              child: DecimalNumberField(
                 label: 'K+ (mmol/l)',
                 value: s.bgaK,
-                onChanged: (v) => setState(() {
+                onChanged: (v) {
                   s.bgaK = v;
+                  setState(() {});
                   widget.onChanged();
-                }),
+                },
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: _numberField(
+              child: DecimalNumberField(
                 label: 'BZ (mg/dl)',
                 value: s.bgaBz,
-                onChanged: (v) => setState(() {
+                onChanged: (v) {
                   s.bgaBz = v;
+                  setState(() {});
                   widget.onChanged();
-                }),
+                },
               ),
             ),
           ],
@@ -224,30 +233,4 @@ class _BgaSectionState extends State<BgaSection> {
     );
   }
 
-  Widget _numberField({
-    required String label,
-    required double? value,
-    required ValueChanged<double?> onChanged,
-    int decimals = 0,
-    bool allowNegative = false,
-  }) {
-    final text = value == null ? '' : (decimals > 0 ? value.toStringAsFixed(decimals) : _fmt(value));
-    final ctrl = TextEditingController(text: text);
-    return TextField(
-      controller: ctrl..selection = TextSelection.collapsed(offset: ctrl.text.length),
-      keyboardType: decimalKeyboardType(allowNegative: allowNegative),
-      inputFormatters: decimalInputFormatters(decimalDigits: 2, allowNegative: allowNegative),
-      decoration: InputDecoration(
-        labelText: label,
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      ),
-      onChanged: (v) => onChanged(double.tryParse(v.replaceAll(',', '.'))),
-    );
-  }
-
-  String _fmt(double v) {
-    if (v == v.roundToDouble()) return v.toInt().toString();
-    return v.toStringAsFixed(2);
-  }
 }

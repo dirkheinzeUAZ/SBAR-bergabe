@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/sbar_data.dart';
 import '../theme/app_theme.dart';
-import '../utils/decimal_input_formatter.dart';
+import 'decimal_number_field.dart';
 
 /// Kreislauf-Abschnitt: Katecholamine ja/nein, pro Substanz Dosierung
 /// (µg/kg/min) <-> Perfusor-Laufrate (ml/h), Umrechnung in beide Richtungen
@@ -171,11 +171,11 @@ class _KreislaufSectionState extends State<KreislaufSection> {
           Row(
             children: [
               Expanded(
-                child: _numberField(
+                child: DecimalNumberField(
                   label: 'Konzentration (mg/ml)',
                   value: entry.konzentrationMgMl,
                   onChanged: (v) {
-                    setState(() => entry.konzentrationMgMl = v);
+                    entry.konzentrationMgMl = v;
                     _recalcFromDosis(entry);
                     widget.onChanged();
                   },
@@ -188,11 +188,11 @@ class _KreislaufSectionState extends State<KreislaufSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: _numberField(
+                child: DecimalNumberField(
                   label: 'Dosierung (µg/kg/min)',
                   value: entry.dosierungMcgKgMin,
                   onChanged: (v) {
-                    setState(() => entry.dosierungMcgKgMin = v);
+                    entry.dosierungMcgKgMin = v;
                     _recalcLaufrate(entry);
                     widget.onChanged();
                   },
@@ -203,11 +203,11 @@ class _KreislaufSectionState extends State<KreislaufSection> {
                 child: Icon(Icons.sync_alt, size: 18, color: AppColors.textMuted),
               ),
               Expanded(
-                child: _numberField(
+                child: DecimalNumberField(
                   label: 'Laufrate (ml/h)',
                   value: entry.laufrateMlH,
                   onChanged: (v) {
-                    setState(() => entry.laufrateMlH = v);
+                    entry.laufrateMlH = v;
                     _recalcDosis(entry);
                     widget.onChanged();
                   },
@@ -223,22 +223,6 @@ class _KreislaufSectionState extends State<KreislaufSection> {
         ],
       ),
     );
-  }
-
-  Widget _numberField({required String label, required double? value, required ValueChanged<double?> onChanged}) {
-    final ctrl = TextEditingController(text: value == null ? '' : _fmt(value));
-    return TextField(
-      controller: ctrl..selection = TextSelection.collapsed(offset: ctrl.text.length),
-      keyboardType: decimalKeyboardType(),
-      inputFormatters: decimalInputFormatters(decimalDigits: 2),
-      decoration: InputDecoration(labelText: label, isDense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10)),
-      onChanged: (v) => onChanged(double.tryParse(v.replaceAll(',', '.'))),
-    );
-  }
-
-  String _fmt(double v) {
-    if (v == v.roundToDouble()) return v.toInt().toString();
-    return v.toStringAsFixed(2);
   }
 
   // Laufrate (ml/h) = Dosierung(µg/kg/min) * Gewicht(kg) * 60 / (Konzentration(mg/ml) * 1000)

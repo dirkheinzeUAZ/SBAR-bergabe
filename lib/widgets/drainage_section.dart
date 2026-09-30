@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/sbar_data.dart';
 import '../theme/app_theme.dart';
-import '../utils/decimal_input_formatter.dart';
+import 'decimal_number_field.dart';
 
 /// Drainagen-Abschnitt: strukturierte Liste mit mehreren Einträgen.
 /// Typen: Ventrikel, Redon, Robinson, Thorax, Easyflow.
@@ -168,11 +168,11 @@ class _DrainageSectionState extends State<DrainageSection> {
           ],
           if (entry.type == 'Ventrikel') ...[
             const SizedBox(height: 10),
-            _numberField(
+            DecimalNumberField(
               label: 'Höhe (cm über Kopf)',
               value: entry.hoeheCmUeberKopf,
               onChanged: (v) {
-                setState(() => entry.hoeheCmUeberKopf = v);
+                entry.hoeheCmUeberKopf = v;
                 widget.onChanged();
               },
             ),
@@ -201,23 +201,4 @@ class _DrainageSectionState extends State<DrainageSection> {
     );
   }
 
-  Widget _numberField({required String label, required double? value, required ValueChanged<double?> onChanged}) {
-    final ctrl = TextEditingController(text: value == null ? '' : _fmt(value));
-    return TextField(
-      controller: ctrl..selection = TextSelection.collapsed(offset: ctrl.text.length),
-      keyboardType: decimalKeyboardType(),
-      inputFormatters: decimalInputFormatters(decimalDigits: 2),
-      decoration: InputDecoration(
-        labelText: label,
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      ),
-      onChanged: (v) => onChanged(double.tryParse(v.replaceAll(',', '.'))),
-    );
-  }
-
-  String _fmt(double v) {
-    if (v == v.roundToDouble()) return v.toInt().toString();
-    return v.toStringAsFixed(2);
-  }
 }
