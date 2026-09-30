@@ -5,6 +5,8 @@ import '../theme/app_theme.dart';
 import '../widgets/voice_text_field.dart';
 import '../widgets/category_card.dart';
 import '../widgets/score_selectors.dart';
+import '../widgets/kreislauf_section.dart';
+import '../widgets/atmung_section.dart';
 import 'bed_edit_screen.dart';
 import 'guided_mode_screen.dart';
 import 'draft_screen.dart';
@@ -315,26 +317,74 @@ class _SbarHandoverScreenState extends State<SbarHandoverScreen> with SingleTick
         CategoryCard(
           icon: Icons.air,
           title: 'Atmung / Beatmung / BGA',
-          subtitle: _atmungCtrl.text.trim().isEmpty ? 'Keine Angabe' : 'Erfasst',
+          subtitle: s.spontanatmungJa ? 'Spontanatmung' : s.atmungsart,
           initiallyExpanded: true,
-          child: VoiceTextField(
-            label: '',
-            hint: 'Beatmungsmodus, Parameter, BGA-Werte...',
-            controller: _atmungCtrl,
-            showPrivacyHint: false,
-            onChanged: (_) => _logChangeAndSave('Atmung/Beatmung/BGA'),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AtmungSection(
+                spontanatmungJa: s.spontanatmungJa,
+                atmungsart: s.atmungsart,
+                beatmungsform: s.beatmungsform,
+                beatmungsmodusFreitext: s.beatmungsmodusFreitext,
+                onSpontanChanged: (v) {
+                  setState(() => s.spontanatmungJa = v);
+                  _logChangeAndSave('Atmung – Spontanatmung');
+                },
+                onAtmungsartChanged: (v) {
+                  setState(() => s.atmungsart = v);
+                  _logChangeAndSave('Atmung – Atemwegszugang');
+                },
+                onBeatmungsformChanged: (v) {
+                  setState(() => s.beatmungsform = v);
+                  _logChangeAndSave('Atmung – Beatmungsform');
+                },
+                onFreitextChanged: (v) {
+                  setState(() => s.beatmungsmodusFreitext = v);
+                  _logChangeAndSave('Atmung – Modus');
+                },
+              ),
+              const SizedBox(height: 14),
+              VoiceTextField(
+                label: 'Weitere Angaben (BGA, Parameter, ...)',
+                hint: 'BGA-Werte, sonstige Parameter...',
+                controller: _atmungCtrl,
+                showPrivacyHint: false,
+                minLines: 2,
+                maxLines: 6,
+                onChanged: (_) => _logChangeAndSave('Atmung/Beatmung/BGA'),
+              ),
+            ],
           ),
         ),
         CategoryCard(
           icon: Icons.favorite_border,
           title: 'Kreislauf',
-          subtitle: _kreislaufCtrl.text.trim().isEmpty ? 'Keine Angabe' : 'Erfasst',
-          child: VoiceTextField(
-            label: '',
-            hint: 'Katecholamine (Substanz/Dosis), Ziel-/Grenzwerte...',
-            controller: _kreislaufCtrl,
-            showPrivacyHint: false,
-            onChanged: (_) => _logChangeAndSave('Kreislauf'),
+          subtitle: s.katecholamineJa ? 'Katecholamine aktiv' : 'Keine Katecholamine',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              KreislaufSection(
+                katecholamineJa: s.katecholamineJa,
+                entries: s.katecholamine,
+                patientWeightKg: widget.bed.weightKg,
+                onJaChanged: (v) {
+                  setState(() => s.katecholamineJa = v);
+                  _logChangeAndSave('Kreislauf – Katecholamine');
+                },
+                onChanged: () => _logChangeAndSave('Kreislauf – Katecholamine'),
+              ),
+              const SizedBox(height: 14),
+              VoiceTextField(
+                label: 'Weitere Angaben (Ziel-/Grenzwerte, ...)',
+                hint: 'Ziel-/Grenzwerte, sonstige Angaben...',
+                controller: _kreislaufCtrl,
+                showPrivacyHint: false,
+                minLines: 2,
+                maxLines: 6,
+                onChanged: (_) => _logChangeAndSave('Kreislauf'),
+              ),
+            ],
           ),
         ),
         CategoryCard(

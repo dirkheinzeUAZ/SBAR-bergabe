@@ -1,5 +1,40 @@
 import 'change_log_entry.dart';
 
+/// Ein Katecholamin-Eintrag im Kreislauf-Bereich: Substanz + Dosierung
+/// (µg/kg/min) und die daraus resultierende Perfusor-Laufrate (ml/h).
+/// Die Umrechnung funktioniert in beide Richtungen (siehe KreislaufSection).
+class CatecholamineEntry {
+  String name; // 'Arterenol' | 'Dobutamin' | 'Vasopressin' | 'Sonstiges'
+  String freitext; // nur relevant bei name == 'Sonstiges'
+  double? konzentrationMgMl; // Perfusor-Konzentration
+  double? dosierungMcgKgMin; // Dosierung pro kg Körpergewicht
+  double? laufrateMlH; // daraus berechnete/eingegebene Perfusor-Laufrate
+
+  CatecholamineEntry({
+    this.name = 'Arterenol',
+    this.freitext = '',
+    this.konzentrationMgMl,
+    this.dosierungMcgKgMin,
+    this.laufrateMlH,
+  });
+
+  Map<String, dynamic> toMap() => {
+        'name': name,
+        'freitext': freitext,
+        'konzentrationMgMl': konzentrationMgMl,
+        'dosierungMcgKgMin': dosierungMcgKgMin,
+        'laufrateMlH': laufrateMlH,
+      };
+
+  factory CatecholamineEntry.fromMap(Map map) => CatecholamineEntry(
+        name: map['name']?.toString() ?? 'Arterenol',
+        freitext: map['freitext']?.toString() ?? '',
+        konzentrationMgMl: (map['konzentrationMgMl'] as num?)?.toDouble(),
+        dosierungMcgKgMin: (map['dosierungMcgKgMin'] as num?)?.toDouble(),
+        laufrateMlH: (map['laufrateMlH'] as num?)?.toDouble(),
+      );
+}
+
 /// Enthält den kompletten SBAR-Übergabetext für ein Bett.
 /// Bewusst schlanke Struktur: alles reine medizinische Inhalte,
 /// keine identifizierenden Angaben möglich.
@@ -11,8 +46,18 @@ class SbarData {
   String background;
 
   // A – Assessment (Unterkategorien)
-  String atmungBeatmung;
-  String kreislauf;
+
+  // Atmung – strukturiert
+  bool spontanatmungJa;
+  String atmungsart; // 'Tubus/Trachealkanüle' | 'Maske' | 'HFNO'
+  String beatmungsform; // 'kontrolliert' | 'assistiert' | 'unterstützt'
+  String beatmungsmodusFreitext;
+  String atmungBeatmung; // ergänzende Freitext-Angaben (BGA etc.)
+
+  // Kreislauf – strukturiert
+  bool katecholamineJa;
+  List<CatecholamineEntry> katecholamine;
+  String kreislauf; // ergänzende Freitext-Angaben (Ziel-/Grenzwerte etc.)
 
   // Neurologie
   int? rassScore; // -5 .. +4
@@ -57,7 +102,13 @@ class SbarData {
   SbarData({
     this.situation = '',
     this.background = '',
+    this.spontanatmungJa = true,
+    this.atmungsart = 'Tubus/Trachealkanüle',
+    this.beatmungsform = 'kontrolliert',
+    this.beatmungsmodusFreitext = '',
     this.atmungBeatmung = '',
+    this.katecholamineJa = false,
+    List<CatecholamineEntry>? katecholamine,
     this.kreislauf = '',
     this.rassScore,
     this.camIcuStatus = 'nicht erhoben',
@@ -80,7 +131,8 @@ class SbarData {
     this.geplanteInterventionen = '',
     List<ChangeLogEntry>? changeLog,
     DateTime? updatedAt,
-  })  : changeLog = changeLog ?? [],
+  })  : katecholamine = katecholamine ?? [],
+        changeLog = changeLog ?? [],
         updatedAt = updatedAt ?? DateTime.now();
 
   void addChange(String categoryLabel, {String? note}) {
@@ -94,7 +146,13 @@ class SbarData {
   Map<String, dynamic> toMap() => {
         'situation': situation,
         'background': background,
+        'spontanatmungJa': spontanatmungJa,
+        'atmungsart': atmungsart,
+        'beatmungsform': beatmungsform,
+        'beatmungsmodusFreitext': beatmungsmodusFreitext,
         'atmungBeatmung': atmungBeatmung,
+        'katecholamineJa': katecholamineJa,
+        'katecholamine': katecholamine.map((e) => e.toMap()).toList(),
         'kreislauf': kreislauf,
         'rassScore': rassScore,
         'camIcuStatus': camIcuStatus,
@@ -123,7 +181,15 @@ class SbarData {
     return SbarData(
       situation: map['situation']?.toString() ?? '',
       background: map['background']?.toString() ?? '',
+      spontanatmungJa: map['spontanatmungJa'] == null ? true : map['spontanatmungJa'] == true,
+      atmungsart: map['atmungsart']?.toString() ?? 'Tubus/Trachealkanüle',
+      beatmungsform: map['beatmungsform']?.toString() ?? 'kontrolliert',
+      beatmungsmodusFreitext: map['beatmungsmodusFreitext']?.toString() ?? '',
       atmungBeatmung: map['atmungBeatmung']?.toString() ?? '',
+      katecholamineJa: map['katecholamineJa'] == true,
+      katecholamine: (map['katecholamine'] as List? ?? [])
+          .map((e) => CatecholamineEntry.fromMap(Map<String, dynamic>.from(e as Map)))
+          .toList(),
       kreislauf: map['kreislauf']?.toString() ?? '',
       rassScore: map['rassScore'] is int ? map['rassScore'] as int : int.tryParse(map['rassScore']?.toString() ?? ''),
       camIcuStatus: map['camIcuStatus']?.toString() ?? 'nicht erhoben',
@@ -172,8 +238,8 @@ class SbarData {
     buf.writeln(background.trim().isEmpty ? '– keine Angabe –' : background.trim());
     buf.writeln();
     buf.writeln('A – ASSESSMENT');
-    buf.writeln('• Atmung/Beatmung/BGA: ${_orDash(atmungBeatmung)}');
-    buf.writeln('• Kreislauf: ${_orDash(kreislauf)}');
+    buf.writeln('• Atmung: ${_atmungSummary()}${atmungBeatmung.trim().isNotEmpty ? ' – ${atmungBeatmung.trim()}' : ''}');
+    buf.writeln('• Kreislauf: ${_kreislaufSummary()}${kreislauf.trim().isNotEmpty ? ' – ${kreislauf.trim()}' : ''}');
     buf.writeln('• Neurologie:');
     buf.writeln('   - Bewusstsein (RASS): ${rassScore != null ? rassScore.toString() : '– n.e. –'}');
     buf.writeln('   - Delir (CAM-ICU): $camIcuStatus');
@@ -190,6 +256,25 @@ class SbarData {
     buf.writeln('• Offene Aufgaben: ${_orDash(offeneAufgaben)}');
     buf.writeln('• Geplante Interventionen: ${_orDash(geplanteInterventionen)}');
     return buf.toString();
+  }
+
+  String _atmungSummary() {
+    if (spontanatmungJa) return 'Spontanatmung';
+    final art = atmungsart == 'Tubus/Trachealkanüle'
+        ? 'Tubus/Trachealkanüle ($beatmungsform${beatmungsmodusFreitext.trim().isNotEmpty ? ', ${beatmungsmodusFreitext.trim()}' : ''})'
+        : atmungsart;
+    return art;
+  }
+
+  String _kreislaufSummary() {
+    if (!katecholamineJa || katecholamine.isEmpty) return 'keine Katecholamine';
+    return katecholamine.map((k) {
+      final subst = k.name == 'Sonstiges' ? (k.freitext.trim().isEmpty ? 'Sonstiges' : k.freitext.trim()) : k.name;
+      final dosis = k.dosierungMcgKgMin != null ? '${k.dosierungMcgKgMin} µg/kg/min' : null;
+      final rate = k.laufrateMlH != null ? '${k.laufrateMlH} ml/h' : null;
+      final details = [dosis, rate].where((e) => e != null).join(' / ');
+      return details.isEmpty ? subst : '$subst ($details)';
+    }).join(', ');
   }
 
   String _orDash(String s) => s.trim().isEmpty ? '–' : s.trim();
