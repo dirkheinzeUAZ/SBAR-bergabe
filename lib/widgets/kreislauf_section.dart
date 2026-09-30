@@ -229,7 +229,7 @@ class _KreislaufSectionState extends State<KreislaufSection> {
     final ctrl = TextEditingController(text: value == null ? '' : _fmt(value));
     return TextField(
       controller: ctrl..selection = TextSelection.collapsed(offset: ctrl.text.length),
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      keyboardType: decimalKeyboardType(),
       inputFormatters: decimalInputFormatters(decimalDigits: 2),
       decoration: InputDecoration(labelText: label, isDense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10)),
       onChanged: (v) => onChanged(double.tryParse(v.replaceAll(',', '.'))),

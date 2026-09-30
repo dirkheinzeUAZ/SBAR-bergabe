@@ -235,7 +235,7 @@ class _BgaSectionState extends State<BgaSection> {
     final ctrl = TextEditingController(text: text);
     return TextField(
       controller: ctrl..selection = TextSelection.collapsed(offset: ctrl.text.length),
-      keyboardType: TextInputType.numberWithOptions(decimal: true, signed: allowNegative),
+      keyboardType: decimalKeyboardType(allowNegative: allowNegative),
       inputFormatters: decimalInputFormatters(decimalDigits: 2, allowNegative: allowNegative),
       decoration: InputDecoration(
         labelText: label,

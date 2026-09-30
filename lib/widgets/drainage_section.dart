@@ -205,7 +205,7 @@ class _DrainageSectionState extends State<DrainageSection> {
     final ctrl = TextEditingController(text: value == null ? '' : _fmt(value));
     return TextField(
       controller: ctrl..selection = TextSelection.collapsed(offset: ctrl.text.length),
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      keyboardType: decimalKeyboardType(),
       inputFormatters: decimalInputFormatters(decimalDigits: 2),
       decoration: InputDecoration(
         labelText: label,

@@ -130,7 +130,7 @@ class _BedEditScreenState extends State<BedEditScreen> {
                           _label('Gewicht (kg)'),
                           TextField(
                             controller: _weightCtrl,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: decimalKeyboardType(),
                             inputFormatters: decimalInputFormatters(decimalDigits: 2),
                             decoration: const InputDecoration(hintText: 'z.B. 78'),
                           ),
@@ -143,7 +143,7 @@ class _BedEditScreenState extends State<BedEditScreen> {
                 _label('Größe (cm)'),
                 TextField(
                   controller: _heightCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: decimalKeyboardType(),
                   inputFormatters: decimalInputFormatters(decimalDigits: 2),
                   decoration: const InputDecoration(hintText: 'z.B. 175'),
                 ),
