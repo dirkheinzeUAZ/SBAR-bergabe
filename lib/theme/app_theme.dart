@@ -115,6 +115,11 @@ class AppTheme {
           textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
         ),
       ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primaryBlue,
+        foregroundColor: Colors.white,
+        extendedTextStyle: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+      ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
         selectedItemColor: AppColors.primaryBlue,

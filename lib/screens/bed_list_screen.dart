@@ -171,8 +171,18 @@ class _BedListScreenState extends State<BedListScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _createNewBed,
         backgroundColor: AppColors.primaryBlue,
-        icon: const Icon(Icons.add),
-        label: const Text('Bett anlegen'),
+        foregroundColor: Colors.white,
+        elevation: 4,
+        extendedPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        icon: const Icon(Icons.add, color: Colors.white, size: 26),
+        label: const Text(
+          'Bett anlegen',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
     );
   }
